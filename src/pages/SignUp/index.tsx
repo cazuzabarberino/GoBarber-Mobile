@@ -1,22 +1,29 @@
-import React from "react";
+import { useNavigation } from "@react-navigation/native";
+import React, { useCallback, useRef } from "react";
 import {
   Image,
-  View,
   KeyboardAvoidingView,
-  ScrollView,
   Platform,
+  ScrollView,
+  View,
 } from "react-native";
-import { Container, Title, BackToSignIn, BackToSignInText } from "./styles";
-
-import Input from "../../components/Input";
-import Button from "../../components/Button";
-
-import logoImg from "../../assets/logo.png";
 import Icon from "react-native-vector-icons/Feather";
-import { useNavigation } from "@react-navigation/native";
+import logoImg from "../../assets/logo.png";
+import Button from "../../components/Button";
+import Input from "../../components/Input";
+import { BackToSignIn, BackToSignInText, Container, Title } from "./styles";
+import { FormHandles } from "@unform/core";
+import { Form } from "@unform/mobile";
 
 export default () => {
   const navigation = useNavigation();
+
+  const formRef = useRef<FormHandles>(null);
+
+  const handleSubmit = useCallback((data: object) => {
+    console.log(data);
+  }, []);
+
   return (
     <>
       <KeyboardAvoidingView
@@ -35,11 +42,19 @@ export default () => {
               <Title>Crie sua conta</Title>
             </View>
 
-            <Input name="name" icon="user" placeholder="Name" />
-            <Input name="email" icon="mail" placeholder="E-mail" />
-            <Input name="password" icon="lock" placeholder="Password" />
+            <Form ref={formRef} onSubmit={handleSubmit}>
+              <Input name="name" icon="user" placeholder="Name" />
+              <Input name="email" icon="mail" placeholder="E-mail" />
+              <Input name="password" icon="lock" placeholder="Password" />
+            </Form>
 
-            <Button>Entrar</Button>
+            <Button
+              onPress={() => {
+                formRef.current?.submitForm();
+              }}
+            >
+              Entrar
+            </Button>
           </Container>
         </ScrollView>
       </KeyboardAvoidingView>
