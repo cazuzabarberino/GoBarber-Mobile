@@ -24,6 +24,7 @@ import {
   Title,
 } from "./styles";
 import * as Yup from "yup";
+import { useAuth } from "../../hooks/Auth";
 
 import getValidationErrors from "../../utils/getValidationErrors";
 
@@ -36,6 +37,7 @@ export default () => {
   const navigation = useNavigation();
   const formRef = useRef<FormHandles>(null);
   const passwordInputRef = useRef<TextInput>(null);
+  const { signIn } = useAuth();
 
   const handleSignIn = useCallback(async (data: SignInFormData) => {
     try {
@@ -52,10 +54,10 @@ export default () => {
         abortEarly: false,
       });
 
-      // await signIn({
-      //   email: data.email,
-      //   password: data.password,
-      // });
+      await signIn({
+        email: data.email,
+        password: data.password,
+      });
 
       // history.push("/dashboard");
     } catch (err) {
@@ -72,7 +74,7 @@ export default () => {
         "Erro ao fazer login, cheque as credenciais"
       );
     }
-  }, []);
+  }, [signIn]);
 
   return (
     <>

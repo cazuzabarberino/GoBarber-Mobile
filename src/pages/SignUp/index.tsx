@@ -69,7 +69,7 @@ export default () => {
         "Ocorreu um erro ao fazer cadastro, tente novamente."
       );
     }
-  }, []);
+  }, [navigation]);
 
   return (
     <>
