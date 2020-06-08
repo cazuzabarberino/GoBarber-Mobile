@@ -1,4 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import { TextInputProps } from "react-native";
 import { Container, TextInput, Icon } from "./styles";
 import { useField } from "@unform/core";
@@ -12,24 +17,37 @@ interface InputValueReference {
   value: string;
 }
 
-const Input: React.FC<InputProps> = ({ name, icon, ...rest }) => {
+interface InputRef {
+  focus(): void;
+}
+
+const Input: React.RefForwardingComponent<InputRef, InputProps> = (
+  { name, icon, ...rest },
+  ref
+) => {
   const { registerField, defaultValue = "", fieldName, error } = useField(name);
 
-  const inputElemenrRef = useRef<any>(null);
+  const inputElementRef = useRef<any>(null);
   const inputValueRef = useRef<InputValueReference>({ value: defaultValue });
+
+  useImperativeHandle(ref, () => ({
+    focus() {
+      inputElementRef.current.focus();
+    },
+  }));
 
   useEffect(() => {
     registerField<string>({
       name: fieldName,
       ref: inputValueRef.current,
       path: "value",
-      setValue(reF: any, value) {
+      setValue(ref: any, value) {
         inputValueRef.current.value = value;
-        inputElemenrRef.current.setNativeProps({ text: value });
+        inputElementRef.current.setNativeProps({ text: value });
       },
       clearValue() {
         inputValueRef.current.value = "";
-        inputElemenrRef.current.clear();
+        inputElementRef.current.clear();
       },
     });
   }, [fieldName, registerField]);
@@ -39,7 +57,7 @@ const Input: React.FC<InputProps> = ({ name, icon, ...rest }) => {
       <Icon name={icon} size={20} color="#666360" />
 
       <TextInput
-        ref={inputElemenrRef}
+        ref={inputElementRef}
         keyboardAppearance="dark"
         placeholderTextColor="#666360"
         defaultValue={defaultValue}
@@ -50,4 +68,4 @@ const Input: React.FC<InputProps> = ({ name, icon, ...rest }) => {
   );
 };
 
-export default Input;
+export default forwardRef(Input);

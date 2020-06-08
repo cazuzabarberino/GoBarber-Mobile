@@ -6,6 +6,7 @@ import {
   Platform,
   ScrollView,
   View,
+  TextInput,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import logoImg from "../../assets/logo.png";
@@ -19,6 +20,9 @@ export default () => {
   const navigation = useNavigation();
 
   const formRef = useRef<FormHandles>(null);
+
+  const emailInputRef = useRef<TextInput>(null);
+  const passwordInputRef = useRef<TextInput>(null);
 
   const handleSubmit = useCallback((data: object) => {
     console.log(data);
@@ -43,9 +47,37 @@ export default () => {
             </View>
 
             <Form ref={formRef} onSubmit={handleSubmit}>
-              <Input name="name" icon="user" placeholder="Name" />
-              <Input name="email" icon="mail" placeholder="E-mail" />
-              <Input name="password" icon="lock" placeholder="Password" />
+              <Input
+                autoCapitalize="words"
+                name="name"
+                icon="user"
+                placeholder="Name"
+                returnKeyType="next"
+                onSubmitEditing={() => emailInputRef.current?.focus()}
+              />
+              <Input
+                ref={emailInputRef}
+                autoCorrect={false}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                name="email"
+                icon="mail"
+                placeholder="E-mail"
+                returnKeyType="next"
+                onSubmitEditing={() => passwordInputRef.current?.focus()}
+              />
+              <Input
+                ref={passwordInputRef}
+                secureTextEntry
+                name="password"
+                icon="lock"
+                placeholder="Password"
+                textContentType="newPassword"
+                returnKeyType="send"
+                onSubmitEditing={() => {
+                  formRef.current?.submitForm();
+                }}
+              />
             </Form>
 
             <Button
