@@ -15,6 +15,14 @@ import Input from "../../components/Input";
 import { BackToSignIn, BackToSignInText, Container, Title } from "./styles";
 import { FormHandles } from "@unform/core";
 import { Form } from "@unform/mobile";
+import * as Yup from "yup";
+import getValidationErrors from "../../utils/getValidationErrors";
+
+interface SignUpFormData {
+  name: string;
+  email: string;
+  password: string;
+}
 
 export default () => {
   const navigation = useNavigation();
@@ -24,8 +32,46 @@ export default () => {
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
 
-  const handleSubmit = useCallback((data: object) => {
-    console.log(data);
+  const handleSignUp = useCallback(async (data: SignUpFormData) => {
+    try {
+      formRef.current?.setErrors({});
+
+      const schema = Yup.object().shape({
+        name: Yup.string().required("Nome obrigatório"),
+        email: Yup.string()
+          .required("Email obrigatório")
+          .email("Digite um email válido"),
+        password: Yup.string().min(6, "No mínimo 6 dígitos"),
+      });
+
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+
+      // await api.post("/users", data);
+
+      // history.push("/");
+
+      // addToast({
+      //   type: "success",
+      //   title: "Cadastro Realizado",
+      //   description: "Você já pode fazer o seu logon",
+      // });
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
+
+        formRef.current?.setErrors(errors);
+
+        return;
+      }
+
+      // addToast({
+      //   type: "error",
+      //   title: "Erro no cadastro",
+      //   description: "Ocorreu um erro ao fazer cadastro, tente novamente.",
+      // });
+    }
   }, []);
 
   return (
@@ -46,7 +92,7 @@ export default () => {
               <Title>Crie sua conta</Title>
             </View>
 
-            <Form ref={formRef} onSubmit={handleSubmit}>
+            <Form ref={formRef} onSubmit={handleSignUp}>
               <Input
                 autoCapitalize="words"
                 name="name"

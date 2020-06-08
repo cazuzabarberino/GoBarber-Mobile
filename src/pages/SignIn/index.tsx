@@ -9,6 +9,7 @@ import {
   ScrollView,
   View,
   TextInput,
+  Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import logoImg from "../../assets/logo.png";
@@ -22,14 +23,55 @@ import {
   ForgotPasswordText,
   Title,
 } from "./styles";
+import * as Yup from "yup";
+
+import getValidationErrors from "../../utils/getValidationErrors";
+
+interface SignInFormData {
+  email: string;
+  password: string;
+}
 
 export default () => {
   const navigation = useNavigation();
   const formRef = useRef<FormHandles>(null);
   const passwordInputRef = useRef<TextInput>(null);
 
-  const handleSignIn = useCallback((data: object) => {
-    console.log(data);
+  const handleSignIn = useCallback(async (data: SignInFormData) => {
+    try {
+      formRef.current?.setErrors({});
+
+      const schema = Yup.object().shape({
+        email: Yup.string()
+          .required("Email obrigatório")
+          .email("Digite um email válido"),
+        password: Yup.string().required("Senha obrigatória"),
+      });
+
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+
+      // await signIn({
+      //   email: data.email,
+      //   password: data.password,
+      // });
+
+      // history.push("/dashboard");
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
+
+        formRef.current?.setErrors(errors);
+
+        return;
+      }
+
+      Alert.alert(
+        "Error na autenticação",
+        "Erro ao fazer login, cheque as credenciais"
+      );
+    }
   }, []);
 
   return (
