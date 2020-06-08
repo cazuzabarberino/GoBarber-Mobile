@@ -7,6 +7,7 @@ import {
   ScrollView,
   View,
   TextInput,
+  Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import logoImg from "../../assets/logo.png";
@@ -17,6 +18,7 @@ import { FormHandles } from "@unform/core";
 import { Form } from "@unform/mobile";
 import * as Yup from "yup";
 import getValidationErrors from "../../utils/getValidationErrors";
+import api from "../../services/api";
 
 interface SignUpFormData {
   name: string;
@@ -48,15 +50,11 @@ export default () => {
         abortEarly: false,
       });
 
-      // await api.post("/users", data);
+      await api.post("/users", data);
 
-      // history.push("/");
+      Alert.alert("Cadastro Realizado", "Você já pode fazer o seu logon");
 
-      // addToast({
-      //   type: "success",
-      //   title: "Cadastro Realizado",
-      //   description: "Você já pode fazer o seu logon",
-      // });
+      navigation.navigate("SignIn");
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErrors(err);
@@ -66,11 +64,10 @@ export default () => {
         return;
       }
 
-      // addToast({
-      //   type: "error",
-      //   title: "Erro no cadastro",
-      //   description: "Ocorreu um erro ao fazer cadastro, tente novamente.",
-      // });
+      Alert.alert(
+        "Erro no cadastro",
+        "Ocorreu um erro ao fazer cadastro, tente novamente."
+      );
     }
   }, []);
 
